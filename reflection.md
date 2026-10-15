@@ -2,6 +2,12 @@
 
 ## 1. System Design
 
+The user MUST be able to:
+
+1. Create and edit pet profiles
+2. create and edit pet tasks with time duration and priority
+3. See today's tasks along with schedule and reasoning
+
 **a. Initial design**
 
 - Briefly describe your initial UML design.
