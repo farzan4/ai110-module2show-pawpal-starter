@@ -6,8 +6,8 @@ classDiagram
         +str name
         +int daily_available_mins
         +List[Pet] pets
-        +Dict preferences
         +add_pet(pet)
+        +remove_pet(pet_id)
         +get_all_tasks()
     }
 
@@ -29,29 +29,18 @@ classDiagram
         +str category
         +int duration_mins
         +int priority
-        +time preferred_time
-        +bool is_flexible
         +bool is_completed
         +mark_complete()
         +update_details()
     }
 
-    class TimeSlot {
-        +Task task
-        +time start_time
-        +time end_time
-        +overlaps_with(other)
-        +get_duration_minutes()
-    }
-
     class Scheduler {
         +generate_schedule(tasks, available_mins)
-        +_resolve_conflicts(slots)
     }
 
     class DailyPlan {
         +date plan_date
-        +List[TimeSlot] scheduled_slots
+        +List[Task] scheduled_tasks
         +List[Task] omitted_tasks
         +List[str] reasoning_log
         +get_total_scheduled_minutes()
@@ -61,6 +50,5 @@ classDiagram
     Owner "1" --> "*" Pet : owns
     Pet "1" --> "*" Task : has
     Scheduler ..> Task : processes
-    Scheduler ..> TimeSlot : creates
-    DailyPlan "1" o-- "*" TimeSlot : contains
+    DailyPlan "1" o-- "*" Task : contains
     DailyPlan "1" o-- "*" Task : omits
