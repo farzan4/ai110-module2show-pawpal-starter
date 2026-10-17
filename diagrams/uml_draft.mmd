@@ -35,20 +35,9 @@ classDiagram
     }
 
     class Scheduler {
-        +generate_schedule(tasks, available_mins)
-    }
-
-    class DailyPlan {
-        +date plan_date
-        +List[Task] scheduled_tasks
-        +List[Task] omitted_tasks
-        +List[str] reasoning_log
-        +get_total_scheduled_minutes()
-        +get_plan_summary()
+        +generate_schedule(tasks, available_mins) Tuple[List[Task], List[Task], List[str]]
     }
 
     Owner "1" --> "*" Pet : owns
     Pet "1" --> "*" Task : has
     Scheduler ..> Task : processes
-    DailyPlan "1" o-- "*" Task : contains
-    DailyPlan "1" o-- "*" Task : omits

@@ -31,6 +31,8 @@ The user MUST be able to:
 
 Yes it did. Initially I only had the Owner, Pet, Task, and DailyPlan classes but then I had to implement the Scheduler class as well. I made it because it makes sense for the Scheduler to not be a part of any of the other data classes and it will be easier to run automated tests for it as well.
 
+Now in Phase 2 im having to take out DailyPlan because that iis how the assignment is designed.
+
 ---
 
 ## 2. Scheduling Logic and Tradeoffs
