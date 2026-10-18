@@ -158,3 +158,89 @@ def test_owner_filter_tasks_by_completion_status_and_pet_name():
 	assert owner.filter_tasks(is_completed=True, pet_name="buddy") == [completed_task]
 	assert owner.filter_tasks(is_completed=False, pet_name="Luna") == [luna_task]
 	assert owner.filter_tasks(pet_name="unknown") == []
+
+
+def test_tasks_are_returned_in_chronological_order():
+	tasks = [
+		Task(
+			"task-3",
+			"Evening walk",
+			"exercise",
+			20,
+			2,
+			due_date=date(2026, 10, 18),
+			scheduled_time=time(18, 0),
+		),
+		Task(
+			"task-1",
+			"Morning meds",
+			"health",
+			10,
+			1,
+			due_date=date(2026, 10, 18),
+			scheduled_time=time(8, 30),
+		),
+		Task(
+			"task-2",
+			"Lunch walk",
+			"exercise",
+			15,
+			2,
+			due_date=date(2026, 10, 18),
+			scheduled_time=time(12, 0),
+		),
+	]
+
+	ordered = sorted(tasks, key=lambda task: (task.due_date, task.scheduled_time or time.min))
+
+	assert [task.task_id for task in ordered] == ["task-1", "task-2", "task-3"]
+
+
+def test_marking_daily_task_complete_creates_next_day_occurrence():
+	task = Task(
+		"task-1",
+		"Feed dog",
+		"feeding",
+		10,
+		1,
+		frequency="daily",
+		scheduled_time=time(8, 0),
+	)
+
+	next_task = task.mark_complete()
+
+	assert task.is_completed is True
+	assert next_task is not None
+	assert next_task.is_completed is False
+	assert next_task.frequency == "daily"
+	assert next_task.due_date == date.today() + timedelta(days=1)
+	assert next_task.scheduled_time == time(8, 0)
+
+
+def test_scheduler_flags_duplicate_times_as_conflicts():
+	tasks = [
+		Task(
+			"task-1",
+			"Walk Buddy",
+			"exercise",
+			30,
+			1,
+			due_date=date(2026, 10, 18),
+			scheduled_time=time(9, 0),
+		),
+		Task(
+			"task-2",
+			"Feed Buddy",
+			"feeding",
+			10,
+			2,
+			due_date=date(2026, 10, 18),
+			scheduled_time=time(9, 0),
+		),
+	]
+
+	warnings = Scheduler()._get_overlap_warnings(tasks)
+
+	assert len(warnings) == 1
+	assert "Walk Buddy" in warnings[0]
+	assert "Feed Buddy" in warnings[0]

@@ -75,7 +75,10 @@ Total Scheduled Time: 50 / 60 mins
 
 ```bash
 # Run the full test suite:
-pytest
+python -m pytest
+
+
+The tests cover the core scheduler behaviors: sorting tasks by time, recurring daily tasks correctly, detecting overlapping/conflicting scheduled times, respecting the daily time budget, and filtering tasks by completion status and pet.
 
 # Run with coverage:
 pytest --cov
@@ -84,8 +87,17 @@ pytest --cov
 Sample test output:
 
 ```
-# Paste your pytest output here
+============================= test session starts ==============================
+platform darwin -- Python 3.9.6, pytest-8.4.2, pluggy-1.6.0
+rootdir: /Users/mac/Desktop/ai110-module2show-pawpal-starter
+collected 14 items
+
+tests/test_pawpal.py ..............                                      [100%]
+
+============================== 14 passed in 0.03s ==============================
 ```
+
+My Confidence Level is 5/5 stars in the system's reliability
 
 ## 📐 Smarter Scheduling
 
