@@ -47,6 +47,8 @@ Now in Phase 2 im having to take out DailyPlan because that iis how the assignme
 - Describe one tradeoff your scheduler makes.
 - Why is that tradeoff reasonable for this scenario?
 
+The scheduler uses a greedy selection strategy: it considers tasks in priority order (and shorter duration first within the same priority), adding each task if it fits in the remaining daily time. This keeps the behavior simple and makes higher-priority tasks more likely to be included, but it does not guarantee the schedule uses every available minute or includes the greatest possible number of tasks. A combination of lower-priority tasks could sometimes fill the time more completely. This is reasonable for PawPal because respecting care-task priorities is more important than maximizing the number of tasks scheduled.
+
 ---
 
 ## 3. AI Collaboration

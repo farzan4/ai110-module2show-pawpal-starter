@@ -91,12 +91,12 @@ Sample test output:
 
 > Fill in once you've implemented scheduling logic.
 
-| Feature           | Method(s) | Notes                             |
-| ----------------- | --------- | --------------------------------- |
-| Task sorting      |           | e.g., by priority, duration       |
-| Filtering         |           | e.g., skip tasks if time runs out |
-| Conflict handling |           | e.g., overlapping time slots      |
-| Recurring tasks   |           | e.g., daily vs. weekly            |
+| Feature           | Method(s)                                                                                   | Notes                                                                                                                                                           |
+| ----------------- | ------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Task sorting      | `Scheduler.sort_by_duration()`, `Scheduler.sort_by_time()`, `Scheduler.generate_schedule()` | Sorts by duration, or by priority then duration when generating the schedule. `sort_by_time()` is a compatibility alias for duration sorting.                   |
+| Filtering         | `Owner.filter_tasks()`, `Scheduler.generate_schedule()`                                     | Filters by pet name and/or completion status; scheduling includes each priority-ordered task that fits the remaining daily minutes and omits tasks that do not. |
+| Conflict handling | `Scheduler._get_overlap_warnings()`                                                         | Detects and logs overlapping scheduled time slots on the same due date; back-to-back tasks are not treated as overlapping.                                      |
+| Recurring tasks   | `Task.mark_complete()`, `Pet.mark_task_complete()`                                          | Completing a daily or weekly task creates its next occurrence; other frequencies do not recur.                                                                  |
 
 ## 📸 Demo Walkthrough
 
