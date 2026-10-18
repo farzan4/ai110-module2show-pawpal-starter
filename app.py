@@ -91,16 +91,38 @@ if owner.pets:
             st.error("Enter a title for the task.")
 
 all_tasks = owner.get_all_tasks()
+scheduler = Scheduler()
 if all_tasks:
     st.markdown("### Pending tasks")
-    st.table(
+    pet_filter = st.selectbox(
+        "Show tasks for",
+        ["All pets", *[pet.name for pet in owner.pets]],
+        key="pending_task_pet_filter",
+    )
+    visible_tasks = (
+        all_tasks
+        if pet_filter == "All pets"
+        else owner.filter_tasks(is_completed=False, pet_name=pet_filter)
+    )
+    sorted_tasks = scheduler.sort_by_duration(visible_tasks)
+    st.caption(
+        f"Showing {len(sorted_tasks)} pending task(s), sorted by shortest duration."
+    )
+    pet_names_by_task = {
+        id(task): pet.name
+        for pet in owner.pets
+        for task in pet.get_pending_tasks()
+    }
+    st.dataframe(
         [
             {
-                "Pet": pet.name,
+                "Pet": pet_names_by_task[id(task)],
                 "Task": task.title,
                 "Category": task.category,
                 "Duration (min)": task.duration_mins,
-                "Priority": task.priority,
+                "Priority": {1: "High", 2: "Medium", 3: "Low"}.get(
+                    task.priority, str(task.priority)
+                ),
                 "Frequency": task.frequency.title(),
                 "Due date": task.due_date.isoformat(),
                 "Scheduled time": (
@@ -109,9 +131,10 @@ if all_tasks:
                     else "Not set"
                 ),
             }
-            for pet in owner.pets
-            for task in pet.get_pending_tasks()
-        ]
+            for task in sorted_tasks
+        ],
+        use_container_width=True,
+        hide_index=True,
     )
 else:
     st.info("No pending tasks yet. Add a task above.")
@@ -146,7 +169,6 @@ if "completion_message" in st.session_state:
 st.divider()
 st.subheader("Build Schedule")
 if st.button("Generate schedule", disabled=not all_tasks):
-    scheduler = Scheduler()
     st.session_state["schedule_result"] = scheduler.generate_schedule(
         tasks=owner.get_all_tasks(),
         available_mins=int(owner.daily_available_mins),
@@ -155,6 +177,21 @@ if st.button("Generate schedule", disabled=not all_tasks):
 if "schedule_result" in st.session_state:
     scheduled, omitted, reasoning = st.session_state["schedule_result"]
     st.markdown("### Today's plan")
+    conflict_warnings = [
+        explanation
+        for explanation in reasoning
+        if explanation.startswith("Warning:")
+    ]
+    if conflict_warnings:
+        conflict_count = len(conflict_warnings)
+        st.warning(
+            f"{conflict_count} scheduling conflict(s) found. Two care tasks "
+            "overlap, so review the task names, date, and start times below. "
+            "Adjust a scheduled time or duration to avoid missing or rushing care."
+        )
+        for warning in conflict_warnings:
+            st.markdown(f"- {warning.removeprefix('Warning: ')}")
+
     if scheduled:
         st.write(f"Scheduled **{sum(task.duration_mins for task in scheduled)} / {int(owner.daily_available_mins)} minutes**")
         for task in scheduled:
@@ -174,7 +211,5 @@ if "schedule_result" in st.session_state:
 
     st.markdown("#### Why this plan")
     for explanation in reasoning:
-        if explanation.startswith("Warning:"):
-            st.warning(explanation)
-        else:
+        if not explanation.startswith("Warning:"):
             st.write(f"- {explanation}")

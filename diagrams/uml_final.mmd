@@ -1,0 +1,51 @@
+classDiagram
+    direction LR
+
+    class Owner {
+        +str owner_id
+        +str name
+        +int daily_available_mins
+        +List[Pet] pets
+        +add_pet(pet)
+        +remove_pet(pet_id)
+        +get_all_tasks()
+        +filter_tasks(is_completed, pet_name) List[Task]
+    }
+
+    class Pet {
+        +str pet_id
+        +str name
+        +str species
+        +float age
+        +List[str] special_needs
+        +List[Task] tasks
+        +add_task(task)
+        +mark_task_complete(task_id) Optional[Task]
+        +remove_task(task_id)
+        +get_pending_tasks()
+    }
+
+    class Task {
+        +str task_id
+        +str title
+        +str category
+        +int duration_mins
+        +int priority
+        +bool is_completed
+        +str frequency
+        +date due_date
+        +Optional[time] scheduled_time
+        +mark_complete() Optional[Task]
+        +update_details()
+    }
+
+    class Scheduler {
+        +sort_by_duration(tasks) List[Task]
+        +sort_by_time(tasks) List[Task]
+        -_get_overlap_warnings(tasks) List[str]
+        +generate_schedule(tasks, available_mins) Tuple[List[Task], List[Task], List[str]]
+    }
+
+    Owner "1" --> "*" Pet : owns[cite: 1]
+    Pet "1" --> "*" Task : has[cite: 1]
+    Scheduler ..> Task : processes[cite: 1]
